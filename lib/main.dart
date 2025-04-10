@@ -9,6 +9,7 @@ import 'screens/profile_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/signup_screen.dart';
 import "screens/login_screen.dart";
+import 'screens/lesson_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,8 +43,8 @@ class MyApp extends StatelessWidget {
         '/signup':
             (context) => const SignupScreen(), // Route for the signup screen
         '/home': (context) => const HomeScreen(), // Route for the home screen
-        '/flashcards':
-            (context) => const FlashcardScreen(), // Route for flashcards
+        '/lesson': (context) => const LessonModuleScreen(lessonId: 1),
+        '/flashcard': (context) => const FlashcardScreen(),
         '/practice': (context) => const PracticeScreen(), // Route for practice
         '/profile': (context) => const ProfileScreen(), // Route for profile
         //'/loading': (context) => const LoadingScreen(),

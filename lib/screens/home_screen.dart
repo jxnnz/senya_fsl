@@ -1,8 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../screens/sidebar.dart';
+import "package:senya_fsl/screens/lesson_screen.dart";
 import '../themes/color.dart';
-import '../themes/layout_config.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,63 +11,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isSidebarExpanded = false;
+  bool _isMobileSidebarOpen = false;
   String _selectedMenu = "home";
+  final GlobalKey _sidebarKey = GlobalKey();
+  Timer? _hoverTimer;
   int streakCount = 5;
   int lives = 3;
   int rubies = 120;
-  bool isStreakActive = true;
+  bool isStreakActive = true; // This should be updated based on login time
 
-  void _handleMenuItemSelected(String menuItem) {
-    setState(() {
-      _selectedMenu = menuItem;
-    });
-
-    // You can also navigate using `Navigator.push` if you'd like to navigate to a new page.
-    switch (menuItem) {
-      case 'home':
-        Navigator.pushReplacementNamed(context, '/home');
-        break;
-      case 'flashcards':
-        Navigator.pushReplacementNamed(context, '/flashcards');
-        break;
-      case 'practice':
-        Navigator.pushReplacementNamed(context, '/practice');
-        break;
-      case 'profile':
-        Navigator.pushReplacementNamed(context, '/profile');
-        break;
-      case 'logout':
-        // Implement logout logic (e.g., clear user session or token)
-        Navigator.pushReplacementNamed(
-          context,
-          '/login',
-        ); // Navigate to login after logout
-        break;
-      default:
-        break;
-    }
-  }
-
-  final LayoutConfig _desktopConfig = LayoutConfig(
-    sidebarWidthExpandedDesktop: 200,
-    sidebarWidthCollapsedDesktop: 100,
-    mobileSidebarWidth: 0,
-    sidebarIconSize: 40,
-    sidebarIconPadding: 10,
-    sidebarLabelFontSize: 16,
-    appBarPaddingHorizontal: 16,
-    appBarPaddingVertical: 10,
-    appBarIconSize: 30,
-    appBarIconSpacing: 16,
-    appBarTextFontSize: 18,
-    screenPadding: const EdgeInsets.all(16.0),
-    unitSectionSpacing: 20,
-    lessonCardHeight: 100,
-    lessonCardPadding: const EdgeInsets.all(12),
-    lessonImageWidth: 70,
-    lessonImageHeight: 70,
-  );
-
+  // Simulated Lesson Data (Replace this with data from Supabase)
+  // TODO: Replace `units` list with Supabase data retrieval.
+  // Fetch units and lessons dynamically and map them accordingly.
   final List<Map<String, dynamic>> units = [
     {
       "title": "Unit 1: Basics",
@@ -114,52 +69,251 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
-      body: Row(
+      body: Stack(
         children: [
-          // Sidebar
-          SizedBox(
-            width: _desktopConfig.sidebarWidthCollapsedDesktop,
-            child: Sidebar(
-              selectedMenu: _selectedMenu,
-              config: _desktopConfig,
-              onMenuSelected: _handleMenuItemSelected,
+          // ------------------- OVERLAY TO CLOSE SIDEBAR -------------------
+          if (_isSidebarExpanded || _isMobileSidebarOpen)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isSidebarExpanded = false;
+                  _isMobileSidebarOpen = false;
+                });
+              },
+              child: Container(
+                color: Colors.black12,
+                width: double.infinity,
+                height: double.infinity,
+              ),
             ),
+
+          // ------------------- SIDEBAR -------------------
+          Row(
+            children: [
+              isMobile
+                  ? _isMobileSidebarOpen
+                      ? _buildSidebar(isMobile: true)
+                      : const SizedBox.shrink()
+                  : MouseRegion(
+                    key: _sidebarKey,
+                    onEnter: (_) {
+                      _hoverTimer?.cancel();
+                      setState(() => _isSidebarExpanded = true);
+                    },
+                    onExit: (_) {
+                      _hoverTimer = Timer(
+                        const Duration(milliseconds: 300),
+                        () {
+                          if (mounted)
+                            setState(() => _isSidebarExpanded = false);
+                        },
+                      );
+                    },
+                    child: _buildSidebar(),
+                  ),
+              // ------------------- MAIN CONTENT -------------------
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _buildAppBarIcon(
+                            Icons.local_fire_department,
+                            streakCount,
+                            isStreakActive ? Colors.orange : Colors.grey,
+                          ),
+                          const SizedBox(width: 16),
+                          _buildAppBarIcon(Icons.favorite, lives, Colors.red),
+                          const SizedBox(width: 16),
+                          _buildAppBarIcon(Icons.diamond, rubies, Colors.blue),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ListView(
+                          children:
+                              units
+                                  .map((unit) => _buildUnitSection(unit))
+                                  .toList(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
+            ],
           ),
-          // Main Content Area
-          Expanded(
-            child: Column(
-              children: [
-                _buildAppBar(),
-                Expanded(child: Padding(padding: _desktopConfig.screenPadding)),
-              ],
+
+          // ------------------- TOGGLE BUTTON FOR MOBILE -------------------
+          if (isMobile && !_isMobileSidebarOpen)
+            Positioned(
+              top: 20,
+              left: 10,
+              child: IconButton(
+                icon: const Icon(Icons.menu, color: AppColors.primaryColor),
+                onPressed: () => setState(() => _isMobileSidebarOpen = true),
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildAppBar() {
-    return Container(
-      color: AppColors.white,
-      padding: EdgeInsets.symmetric(
-        horizontal: _desktopConfig.appBarPaddingHorizontal,
-        vertical: _desktopConfig.appBarPaddingVertical,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+  Widget _buildSidebar({bool isMobile = false}) {
+    final bool expanded = isMobile ? true : _isSidebarExpanded;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: isMobile ? 200 : (expanded ? 200 : 85),
+      color: AppColors.primaryColor,
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildAppBarIcon(
-            Icons.local_fire_department,
-            streakCount,
-            isStreakActive ? AppColors.orange : AppColors.grey,
+          const SizedBox(height: 20),
+          if (isMobile)
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => setState(() => _isMobileSidebarOpen = false),
+            ),
+          Center(
+            child: Image.asset(
+              'assets/images/LOGO.png',
+              width: expanded ? 120 : 50,
+            ),
           ),
-          SizedBox(width: _desktopConfig.appBarIconSpacing),
-          _buildAppBarIcon(Icons.favorite, lives, AppColors.red),
-          SizedBox(width: _desktopConfig.appBarIconSpacing),
-          _buildAppBarIcon(Icons.diamond, rubies, AppColors.blue),
+          const SizedBox(height: 20),
+          _buildSidebarItem("home", Icons.home, "Home", isMobile: isMobile),
+          _buildSidebarItem(
+            "flashcard",
+            Icons.menu_book,
+            "Flashcard",
+            isMobile: isMobile,
+          ),
+          _buildSidebarItem(
+            "practice",
+            Icons.sports_esports,
+            "Practice",
+            isMobile: isMobile,
+          ),
+          _buildSidebarItem(
+            "profile",
+            Icons.person,
+            "Profile",
+            isMobile: isMobile,
+          ),
+          const Spacer(),
+          Center(
+            child: GestureDetector(
+              onTap: _logout,
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.logout,
+                      color: AppColors.selectedColor,
+                      size: 30,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Logout",
+                    style: TextStyle(
+                      color: AppColors.selectedColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarItem(
+    String menu,
+    IconData icon,
+    String label, {
+    bool isMobile = false,
+  }) {
+    bool isSelected = _selectedMenu == menu;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+      child: GestureDetector(
+        onTap: () {
+          setState(() => _selectedMenu = menu);
+          // Navigate based on menu selection
+          if (menu == 'home') {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else if (menu == 'flashcard') {
+            Navigator.pushReplacementNamed(context, '/flashcard');
+          } else if (menu == 'practice') {
+            Navigator.pushReplacementNamed(context, '/practice');
+          } else if (menu == 'profile') {
+            Navigator.pushReplacementNamed(context, '/profile');
+          }
+        },
+        child: Container(
+          decoration:
+              isSelected
+                  ? BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border(
+                      right: BorderSide(color: Colors.white, width: 5),
+                    ),
+                  )
+                  : null,
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color:
+                    isSelected
+                        ? AppColors.selectedColor
+                        : AppColors.unselectedColor,
+                size: 40,
+              ),
+              if (_isSidebarExpanded || isMobile)
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color:
+                          isSelected
+                              ? AppColors.selectedColor
+                              : AppColors.unselectedColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -172,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
           unit["title"],
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: _desktopConfig.unitSectionSpacing),
+        const SizedBox(height: 10),
         Column(
           children:
               unit["lessons"].map<Widget>((lesson) {
@@ -181,11 +335,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     lesson["unlocked"]
                         ? AppColors.lessonColors[index %
                             AppColors.lessonColors.length]
-                        : AppColors.grey;
+                        : Colors.grey;
                 return _buildLessonCard(lesson, color);
               }).toList(),
         ),
-        SizedBox(height: _desktopConfig.unitSectionSpacing),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -195,11 +349,19 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
         onTap: () {
-          // TODO: Navigate to LessonScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => LessonModuleScreen(
+                    lessonId: 1,
+                  ), // pass correct ID dynamically
+            ),
+          );
         },
         child: Container(
-          height: _desktopConfig.lessonCardHeight,
-          padding: _desktopConfig.lessonCardPadding,
+          height: 100, // Adjustable height
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(12),
@@ -215,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       lesson["title"],
                       style: const TextStyle(
-                        color: AppColors.white,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
@@ -224,24 +386,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       "Completed ${(lesson["progress"] * 100).toInt()}%",
                       style: const TextStyle(
-                        color: AppColors.white70,
+                        color: Colors.white70,
                         fontSize: 12,
                       ),
                     ),
                     const SizedBox(height: 4),
                     LinearProgressIndicator(
                       value: lesson["progress"],
-                      backgroundColor: AppColors.white54,
-                      color: AppColors.white,
+                      backgroundColor: Colors.white54,
+                      color: Colors.white,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
               Image.asset(
                 lesson["image"],
-                width: _desktopConfig.lessonImageWidth,
-                height: _desktopConfig.lessonImageHeight,
+                width: 70,
+                height: 70,
                 fit: BoxFit.contain,
               ),
             ],
@@ -251,17 +412,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _logout() {
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
   Widget _buildAppBarIcon(IconData icon, int count, Color color) {
     return Row(
       children: [
-        Icon(icon, color: color, size: _desktopConfig.appBarIconSize),
+        Icon(icon, color: color, size: 30),
         const SizedBox(width: 5),
         Text(
           '$count',
-          style: TextStyle(
-            fontSize: _desktopConfig.appBarTextFontSize,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ],
     );

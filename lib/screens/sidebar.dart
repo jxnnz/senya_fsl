@@ -1,56 +1,82 @@
 import 'package:flutter/material.dart';
 import '../themes/color.dart';
-import '../themes/layout_config.dart';
 
 class Sidebar extends StatelessWidget {
+  final bool isExpanded;
   final String selectedMenu;
   final Function(String) onMenuSelected;
-  final LayoutConfig config;
+  final VoidCallback onLogout;
 
   const Sidebar({
     super.key,
+    required this.isExpanded,
     required this.selectedMenu,
     required this.onMenuSelected,
-    required this.config,
+    required this.onLogout,
   });
 
-  Widget buildMenuItem({
-    required IconData icon,
-    required String label,
-    required String menuKey,
-  }) {
-    final bool isSelected = selectedMenu == menuKey;
-
-    return GestureDetector(
-      onTap: () => onMenuSelected(menuKey),
-      child: Container(
-        width: 98, // Ensure same width
-        height: 88, // Ensure same height
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => onMenuSelected(selectedMenu),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: isExpanded ? 205 : 85,
+        color: AppColors.primaryColor,
+        height: MediaQuery.of(context).size.height,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              color:
-                  isSelected
-                      ? AppColors.selectedColor
-                      : AppColors.unselectedColor,
-              size: 40,
+            const SizedBox(height: 20),
+            Center(
+              child: Image.asset(
+                'assets/images/LOGO.png',
+                width: isExpanded ? 150 : 50,
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.black : Colors.transparent,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+            const SizedBox(height: 20),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildSidebarItem("home", Icons.home, "Home"),
+                  _buildSidebarItem("flashcard", Icons.menu_book, "Flashcard"),
+                  _buildSidebarItem(
+                    "practice",
+                    Icons.sports_esports,
+                    "Practice",
+                  ),
+                  _buildSidebarItem("profile", Icons.person, "Profile"),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: GestureDetector(
+                  onTap: onLogout,
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.logout,
+                        color: AppColors.unselectedColor,
+                        size: 30,
+                      ),
+                      if (isExpanded)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Text(
+                            "Logout",
+                            style: TextStyle(
+                              color: AppColors.unselectedColor,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -59,65 +85,54 @@ class Sidebar extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: config.sidebarWidthExpandedDesktop,
-      color: AppColors.primaryColor,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          // Logo at top
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30.0),
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor: Colors.white,
-              child: Image.asset(
-                'assets/images/LOGO.png', // replace with your logo path
-                width: 60,
+  Widget _buildSidebarItem(String menu, IconData icon, String label) {
+    bool isSelected = selectedMenu == menu;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+      child: GestureDetector(
+        onTap: () => onMenuSelected(menu),
+        child: Container(
+          decoration:
+              isSelected
+                  ? BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: const Border(
+                      right: BorderSide(color: Colors.white, width: 5),
+                    ),
+                  )
+                  : null,
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color:
+                    isSelected
+                        ? AppColors.selectedColor
+                        : AppColors.unselectedColor,
+                size: 40,
               ),
-            ),
+              if (isExpanded)
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color:
+                          isSelected
+                              ? AppColors.selectedColor
+                              : AppColors.unselectedColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+            ],
           ),
-          // Menu items
-          buildMenuItem(icon: Icons.home, label: 'Home', menuKey: 'home'),
-          buildMenuItem(
-            icon: Icons.menu_book,
-            label: 'Flashcards',
-            menuKey: 'flashcards',
-          ),
-          buildMenuItem(
-            icon: Icons.sports_esports,
-            label: 'Practice',
-            menuKey: 'practice',
-          ),
-          buildMenuItem(
-            icon: Icons.person,
-            label: 'Profile',
-            menuKey: 'profile',
-          ),
-          const Spacer(),
-          // Logout
-          GestureDetector(
-            onTap: () {
-              onMenuSelected('logout');
-            },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.logout,
-                color: AppColors.selectedColor,
-                size: 26,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
+
+// Optional: A separate widget for the mobile sidebar with overlay can also be created similarly.

@@ -12,18 +12,26 @@ class WelcomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor:
             AppColors.welcomeScreenTopBar, // Use color from color.dart
         elevation: 0,
         title: Row(
           children: [
-            Image.asset('assets/images/LOGO.png', width: 30, height: 30),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0), // 🧭 Adjust as needed
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 30,
+                height: 30,
+              ),
+            ),
             const SizedBox(width: 8),
             const Text(
               'SENYA',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black, // Keep text color as black
+                color: Colors.black,
                 fontSize: 18,
               ),
             ),
@@ -31,7 +39,7 @@ class WelcomeScreen extends StatelessWidget {
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 8.0),
+            margin: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
             child: ElevatedButton(
               onPressed:
                   () => Navigator.pushNamed(

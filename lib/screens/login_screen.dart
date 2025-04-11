@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            margin: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
             child: ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/signup'),
               style: ElevatedButton.styleFrom(
@@ -188,16 +188,36 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
-                ), // Use primaryColor
+                  color: AppColors.textColor,
+                ),
               ),
               const SizedBox(height: 35),
               TextFormField(
                 controller: _emailController,
                 focusNode: _emailFocusNode,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: AppColors.primaryColor,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
@@ -217,7 +237,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 focusNode: _passwordFocusNode,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: AppColors.primaryColor,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -272,7 +312,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                             'Log In',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                 ),
               ),

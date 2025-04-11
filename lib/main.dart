@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:senya_fsl/themes/color.dart';
+import 'screens/admin/admin_main.dart';
 import 'screens/flashcard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/logo_screen.dart';
@@ -35,18 +36,16 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
 
       routes: {
-        '/': (context) => const LogoScreen(), // Route for the welcome screen
-        '/welcome':
-            (context) => const WelcomeScreen(), // Another way to access welcome
-        '/login':
-            (context) => const LoginScreen(), // Route for the login screen
-        '/signup':
-            (context) => const SignupScreen(), // Route for the signup screen
-        '/home': (context) => const HomeScreen(), // Route for the home screen
+        '/': (context) => const LogoScreen(),
+        '/welcome': (context) => const WelcomeScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/admin': (context) => const AdminMainScreen(),
+        '/home': (context) => const HomeScreen(),
         '/lesson': (context) => const LessonModuleScreen(lessonId: 1),
         '/flashcard': (context) => const FlashcardScreen(),
-        '/practice': (context) => const PracticeScreen(), // Route for practice
-        '/profile': (context) => const ProfileScreen(), // Route for profile
+        '/practice': (context) => const PracticeScreen(),
+        '/profile': (context) => const ProfileScreen(),
         //'/loading': (context) => const LoadingScreen(),
         // Route for loading
       }, // Set the LogoScreen as the starting screen

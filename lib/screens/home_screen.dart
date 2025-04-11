@@ -30,19 +30,19 @@ class _HomeScreenState extends State<HomeScreen> {
       "lessons": [
         {
           "title": "Lesson 1",
-          "image": "assets/icons/lesson1.png",
+          "image": "assets/lesson_images/lesson-alpha1.png",
           "progress": 0.5,
           "unlocked": true,
         },
         {
           "title": "Lesson 2",
-          "image": "assets/icons/lesson2.png",
+          "image": "assets/lesson_images/lesson-alpha2.png",
           "progress": 0.2,
           "unlocked": true,
         },
         {
           "title": "Lesson 3",
-          "image": "assets/icons/lesson3.png",
+          "image": "assets/lesson_images/lesson-introduction.png",
           "progress": 0.0,
           "unlocked": false,
         },
@@ -53,13 +53,13 @@ class _HomeScreenState extends State<HomeScreen> {
       "lessons": [
         {
           "title": "Lesson 1",
-          "image": "assets/icons/lesson4.png",
+          "image": "assets/lesson_images/lesson-num1.png",
           "progress": 0.0,
           "unlocked": false,
         },
         {
           "title": "Lesson 2",
-          "image": "assets/icons/lesson5.png",
+          "image": "assets/lesson_images/lesson-num2.png",
           "progress": 0.0,
           "unlocked": false,
         },

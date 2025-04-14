@@ -1,20 +1,24 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import '../themes/color.dart';
+import '../../themes/color.dart';
 
-class FlashcardScreen extends StatefulWidget {
-  const FlashcardScreen({super.key});
+class GameModeScreen extends StatefulWidget {
+  const GameModeScreen({super.key});
 
   @override
-  State<FlashcardScreen> createState() => _FlashcardScreenState();
+  State<GameModeScreen> createState() => _GameModeScreenState();
 }
 
-class _FlashcardScreenState extends State<FlashcardScreen> {
+class _GameModeScreenState extends State<GameModeScreen> {
   bool _isSidebarExpanded = false;
   bool _isMobileSidebarOpen = false;
-  String _selectedMenu = "flashcard";
-  final GlobalKey _sidebarKey = GlobalKey();
-  Timer? _hoverTimer;
+  String _selectedMenu = "practice";
+  final int streakCount = 10;
+  final bool isStreakActive = true;
+  final int lives = 5;
+  final int rubies = 1000;
+
+  final double buttonHeight = 180;
+  final double buttonWidth = 800;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // ------------------- OVERLAY TO CLOSE SIDEBAR -------------------
+          // Overlay to close sidebar
           if (_isSidebarExpanded || _isMobileSidebarOpen)
             GestureDetector(
               onTap: () {
@@ -39,43 +43,48 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
               ),
             ),
 
-          // ------------------- SIDEBAR -------------------
+          // Sidebar
           Row(
             children: [
-              isMobile
-                  ? _isMobileSidebarOpen
-                      ? _buildSidebar(isMobile: true)
-                      : const SizedBox.shrink()
-                  : MouseRegion(
-                    key: _sidebarKey,
-                    onEnter: (_) {
-                      _hoverTimer?.cancel();
+              if (isMobile)
+                _isMobileSidebarOpen
+                    ? _buildSidebar(isMobile: true)
+                    : const SizedBox.shrink()
+              else
+                GestureDetector(
+                  onTap: () {
+                    if (!_isSidebarExpanded) {
                       setState(() => _isSidebarExpanded = true);
-                    },
-                    onExit: (_) {
-                      _hoverTimer = Timer(
-                        const Duration(milliseconds: 300),
-                        () {
-                          if (mounted)
-                            setState(() => _isSidebarExpanded = false);
-                        },
-                      );
-                    },
-                    child: _buildSidebar(),
-                  ),
-              // ------------------- MAIN CONTENT -------------------
+                    }
+                  },
+                  child: _buildSidebar(isMobile: false),
+                ),
+              //Main Content
               Expanded(
                 child: Column(
                   children: [
-                    // Your main content here
-                    const SizedBox(height: 100),
+                    _buildTopAppBar(context),
+                    const SizedBox(height: 40),
+                    _buildGameButton(
+                      "EASY",
+                      Colors.green.shade600,
+                      Colors.white,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildGameButton(
+                      "MEDIUM",
+                      Colors.yellow.shade400,
+                      Colors.black,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildGameButton("HARD", Colors.red.shade600, Colors.white),
                   ],
                 ),
               ),
             ],
           ),
 
-          // ------------------- TOGGLE BUTTON FOR MOBILE -------------------
+          // Mobile menu toggle
           if (isMobile && !_isMobileSidebarOpen)
             Positioned(
               top: 20,
@@ -92,6 +101,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
 
   Widget _buildSidebar({bool isMobile = false}) {
     final bool expanded = isMobile ? true : _isSidebarExpanded;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: isMobile ? 200 : (expanded ? 200 : 85),
@@ -140,7 +150,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -176,13 +186,14 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     bool isMobile = false,
   }) {
     bool isSelected = _selectedMenu == menu;
+    bool expanded = isMobile || _isSidebarExpanded;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedMenu = menu);
-          // Navigate based on menu selection
+          // Navigate
           if (menu == 'home') {
             Navigator.pushReplacementNamed(context, '/home');
           } else if (menu == 'flashcard') {
@@ -199,7 +210,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                   ? BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border(
+                    border: const Border(
                       right: BorderSide(color: Colors.white, width: 5),
                     ),
                   )
@@ -215,7 +226,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                         : AppColors.unselectedColor,
                 size: 40,
               ),
-              if (_isSidebarExpanded || isMobile)
+              if (expanded)
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
@@ -238,5 +249,95 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
 
   void _logout() {
     Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  Widget _buildTopAppBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Back + Title
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.primaryColor,
+                  size: 30,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                "Game Mode",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+
+          // Streak, Heart, Rubies
+          Row(
+            children: [
+              _buildAppBarIcon(
+                Icons.local_fire_department,
+                streakCount,
+                isStreakActive ? Colors.orange : Colors.grey,
+              ),
+              const SizedBox(width: 16),
+              _buildAppBarIcon(Icons.favorite, lives, Colors.red),
+              const SizedBox(width: 16),
+              _buildAppBarIcon(Icons.diamond, rubies, Colors.pink),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBarIcon(IconData icon, int value, Color color) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 30),
+        const SizedBox(width: 4),
+        Text(
+          "$value",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGameButton(String label, Color bgColor, Color textColor) {
+    return Center(
+      child: Container(
+        width: buttonWidth,
+        height: buttonHeight,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: bgColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            elevation: 2,
+          ),
+          onPressed: () {
+            // Add navigation or logic per difficulty level
+          },
+          child: Text(
+            label,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

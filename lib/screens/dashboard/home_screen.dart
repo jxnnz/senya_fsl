@@ -1,7 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import "package:senya_fsl/screens/lesson_screen.dart";
-import '../themes/color.dart';
+import "package:senya_fsl/screens/dashboard/lesson_screen.dart";
+import '../../themes/color.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,8 +13,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSidebarExpanded = false;
   bool _isMobileSidebarOpen = false;
   String _selectedMenu = "home";
-  final GlobalKey _sidebarKey = GlobalKey();
-  Timer? _hoverTimer;
   int streakCount = 5;
   int lives = 3;
   int rubies = 120;
@@ -93,27 +90,19 @@ class _HomeScreenState extends State<HomeScreen> {
           // ------------------- SIDEBAR -------------------
           Row(
             children: [
-              isMobile
-                  ? _isMobileSidebarOpen
-                      ? _buildSidebar(isMobile: true)
-                      : const SizedBox.shrink()
-                  : MouseRegion(
-                    key: _sidebarKey,
-                    onEnter: (_) {
-                      _hoverTimer?.cancel();
+              if (isMobile)
+                _isMobileSidebarOpen
+                    ? _buildSidebar(isMobile: true)
+                    : const SizedBox.shrink()
+              else
+                GestureDetector(
+                  onTap: () {
+                    if (!_isSidebarExpanded) {
                       setState(() => _isSidebarExpanded = true);
-                    },
-                    onExit: (_) {
-                      _hoverTimer = Timer(
-                        const Duration(milliseconds: 300),
-                        () {
-                          if (mounted)
-                            setState(() => _isSidebarExpanded = false);
-                        },
-                      );
-                    },
-                    child: _buildSidebar(),
-                  ),
+                    }
+                  },
+                  child: _buildSidebar(isMobile: false),
+                ),
               // ------------------- MAIN CONTENT -------------------
               Expanded(
                 child: Column(
@@ -130,12 +119,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildAppBarIcon(
                             Icons.local_fire_department,
                             streakCount,
-                            isStreakActive ? Colors.orange : Colors.grey,
+                            isStreakActive ? AppColors.orange : Colors.grey,
                           ),
                           const SizedBox(width: 16),
-                          _buildAppBarIcon(Icons.favorite, lives, Colors.red),
+                          _buildAppBarIcon(
+                            Icons.favorite,
+                            lives,
+                            AppColors.red,
+                          ),
                           const SizedBox(width: 16),
-                          _buildAppBarIcon(Icons.diamond, rubies, Colors.blue),
+                          _buildAppBarIcon(
+                            Icons.diamond,
+                            rubies,
+                            AppColors.red,
+                          ),
                         ],
                       ),
                     ),
@@ -222,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -258,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
     bool isMobile = false,
   }) {
     bool isSelected = _selectedMenu == menu;
-
+    bool expanded = isMobile || _isSidebarExpanded;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
       child: GestureDetector(
@@ -297,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         : AppColors.unselectedColor,
                 size: 40,
               ),
-              if (_isSidebarExpanded || isMobile)
+              if (expanded)
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(

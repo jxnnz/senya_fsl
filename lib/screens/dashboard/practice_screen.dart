@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import '../themes/color.dart';
+import '../../themes/color.dart';
 
 class PracticeScreen extends StatefulWidget {
   const PracticeScreen({super.key});
@@ -14,8 +12,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
   bool _isSidebarExpanded = false;
   bool _isMobileSidebarOpen = false;
   String _selectedMenu = "practice";
-  final GlobalKey _sidebarKey = GlobalKey();
-  Timer? _hoverTimer;
+  int streakCount = 3;
+  bool isStreakActive = true;
+  int lives = 5;
+  int rubies = 120;
 
   @override
   Widget build(BuildContext context) {
@@ -43,33 +43,55 @@ class _PracticeScreenState extends State<PracticeScreen> {
           // ------------------- SIDEBAR -------------------
           Row(
             children: [
-              isMobile
-                  ? _isMobileSidebarOpen
-                      ? _buildSidebar(isMobile: true)
-                      : const SizedBox.shrink()
-                  : MouseRegion(
-                    key: _sidebarKey,
-                    onEnter: (_) {
-                      _hoverTimer?.cancel();
+              if (isMobile)
+                _isMobileSidebarOpen
+                    ? _buildSidebar(isMobile: true)
+                    : const SizedBox.shrink()
+              else
+                GestureDetector(
+                  onTap: () {
+                    if (!_isSidebarExpanded) {
                       setState(() => _isSidebarExpanded = true);
-                    },
-                    onExit: (_) {
-                      _hoverTimer = Timer(
-                        const Duration(milliseconds: 300),
-                        () {
-                          if (mounted)
-                            setState(() => _isSidebarExpanded = false);
-                        },
-                      );
-                    },
-                    child: _buildSidebar(),
-                  ),
+                    }
+                  },
+                  child: _buildSidebar(isMobile: false),
+                ),
               // ------------------- MAIN CONTENT -------------------
               Expanded(
                 child: Column(
                   children: [
-                    // Your main content here
-                    const SizedBox(height: 100),
+                    _buildTopAppBar(),
+                    Expanded(
+                      child: Center(
+                        child: Wrap(
+                          spacing: 20,
+                          runSpacing: 20,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            _buildPracticeCard(
+                              title: "Game Mode",
+                              iconPath: "assets/images/game.png",
+                              onTap: () {
+                                Navigator.pushNamed(context, '/gamemode');
+                              },
+                              color: Color(0xFF83B100), // Yellow
+                              width: 600,
+                              height: 600,
+                            ),
+                            _buildPracticeCard(
+                              title: "Fingerspelling",
+                              iconPath: "assets/images/fingerspelling.png",
+                              onTap: () {
+                                Navigator.pushNamed(context, '/fingerspelling');
+                              },
+                              color: Color(0xFF2C3F6D), // Blue
+                              width: 600,
+                              height: 600,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -141,7 +163,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -177,7 +199,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
     bool isMobile = false,
   }) {
     bool isSelected = _selectedMenu == menu;
-
+    bool expanded = isMobile || _isSidebarExpanded;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
       child: GestureDetector(
@@ -216,7 +238,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                         : AppColors.unselectedColor,
                 size: 40,
               ),
-              if (_isSidebarExpanded || isMobile)
+              if (expanded)
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
@@ -239,5 +261,103 @@ class _PracticeScreenState extends State<PracticeScreen> {
 
   void _logout() {
     Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  Widget _buildPracticeCard({
+    required String title,
+    required String iconPath,
+    required VoidCallback onTap,
+    required Color color,
+    double width = 250,
+    double height = 200,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 8,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(iconPath, height: 400),
+            const SizedBox(height: 20),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopAppBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left: Page title
+          const Text(
+            "Practice",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryColor,
+            ),
+          ),
+
+          // Right: Icons for Streak, Hearts, Rubies
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildAppBarIcon(
+                Icons.local_fire_department,
+                streakCount,
+                isStreakActive ? AppColors.orange : Colors.grey,
+              ),
+              const SizedBox(width: 16),
+              _buildAppBarIcon(Icons.favorite, lives, AppColors.red),
+              const SizedBox(width: 16),
+              _buildAppBarIcon(Icons.diamond, rubies, AppColors.red),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBarIcon(IconData icon, int value, Color color) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 30),
+        const SizedBox(width: 4),
+        Text(
+          "$value",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
+        ),
+      ],
+    );
   }
 }

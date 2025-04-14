@@ -147,7 +147,7 @@ class WelcomeScreen extends StatelessWidget {
             onPressed:
                 () => Navigator.pushNamed(
                   context,
-                  '/home',
+                  '/home', //'/admin'
                 ), // Update signup route if needed
             style: ElevatedButton.styleFrom(
               backgroundColor:

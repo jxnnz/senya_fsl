@@ -1,21 +1,33 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import '../themes/color.dart';
+import 'package:senya_fsl/widgets/flashcard_set_screen.dart'; // ✅ Use your actual flashcard viewer
+import '../../themes/color.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class FlashcardSet {
+  final String id;
+  final String title;
+  final Color color;
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  FlashcardSet({required this.id, required this.title, required this.color});
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class FlashcardScreen extends StatefulWidget {
+  const FlashcardScreen({super.key});
+
+  @override
+  State<FlashcardScreen> createState() => _FlashcardScreenState();
+}
+
+class _FlashcardScreenState extends State<FlashcardScreen> {
   bool _isSidebarExpanded = false;
   bool _isMobileSidebarOpen = false;
-  String _selectedMenu = "profile";
-  final GlobalKey _sidebarKey = GlobalKey();
-  Timer? _hoverTimer;
+  String _selectedMenu = "flashcard";
+
+  final List<FlashcardSet> flashcardSets = [
+    FlashcardSet(id: "1", title: "Alphabet", color: Colors.blue),
+    FlashcardSet(id: "2", title: "Basics", color: Colors.orange),
+    FlashcardSet(id: "3", title: "Colors", color: Colors.green),
+    FlashcardSet(id: "4", title: "Numbers", color: Colors.purple),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -39,43 +51,90 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: double.infinity,
               ),
             ),
-
           // ------------------- SIDEBAR -------------------
           Row(
             children: [
-              isMobile
-                  ? _isMobileSidebarOpen
-                      ? _buildSidebar(isMobile: true)
-                      : const SizedBox.shrink()
-                  : MouseRegion(
-                    key: _sidebarKey,
-                    onEnter: (_) {
-                      _hoverTimer?.cancel();
+              if (isMobile)
+                _isMobileSidebarOpen
+                    ? _buildSidebar(isMobile: true)
+                    : const SizedBox.shrink()
+              else
+                GestureDetector(
+                  onTap: () {
+                    if (!_isSidebarExpanded) {
                       setState(() => _isSidebarExpanded = true);
-                    },
-                    onExit: (_) {
-                      _hoverTimer = Timer(
-                        const Duration(milliseconds: 300),
-                        () {
-                          if (mounted)
-                            setState(() => _isSidebarExpanded = false);
-                        },
-                      );
-                    },
-                    child: _buildSidebar(),
-                  ),
+                    }
+                  },
+                  child: _buildSidebar(isMobile: false),
+                ),
               // ------------------- MAIN CONTENT -------------------
               Expanded(
                 child: Column(
                   children: [
-                    // Your main content here
-                    const SizedBox(height: 100),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 20,
+                      ),
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: Text(
+                        'Flashcard Sets',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.selectedColor,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GridView.extent(
+                        maxCrossAxisExtent: 300,
+                        padding: const EdgeInsets.all(16),
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        children:
+                            flashcardSets.map((set) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => FlashcardSetScreen(
+                                            setId: set.id,
+                                            setTitle: set.title,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: set.color,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.all(16),
+                                  child: Center(
+                                    child: Text(
+                                      set.title,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
-
           // ------------------- TOGGLE BUTTON FOR MOBILE -------------------
           if (isMobile && !_isMobileSidebarOpen)
             Positioned(
@@ -141,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -177,22 +236,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isMobile = false,
   }) {
     bool isSelected = _selectedMenu == menu;
-
+    bool expanded = isMobile || _isSidebarExpanded;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedMenu = menu);
-          // Navigate based on menu selection
-          if (menu == 'home') {
-            Navigator.pushReplacementNamed(context, '/home');
-          } else if (menu == 'flashcard') {
+          if (menu == 'home') Navigator.pushReplacementNamed(context, '/home');
+          if (menu == 'flashcard')
             Navigator.pushReplacementNamed(context, '/flashcard');
-          } else if (menu == 'practice') {
+          if (menu == 'practice')
             Navigator.pushReplacementNamed(context, '/practice');
-          } else if (menu == 'profile') {
+          if (menu == 'profile')
             Navigator.pushReplacementNamed(context, '/profile');
-          }
         },
         child: Container(
           decoration:
@@ -200,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border(
+                    border: const Border(
                       right: BorderSide(color: Colors.white, width: 5),
                     ),
                   )
@@ -216,7 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : AppColors.unselectedColor,
                 size: 40,
               ),
-              if (_isSidebarExpanded || isMobile)
+              if (expanded)
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(

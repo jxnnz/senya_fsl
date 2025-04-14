@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/learning_top_bar.dart';
-import '../widgets/video_section.dart';
+import '../../widgets/learning_top_bar.dart';
+import '../../widgets/video_section.dart';
 
 class LessonModuleScreen extends StatefulWidget {
   final int lessonId;

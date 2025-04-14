@@ -76,7 +76,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            margin: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
             child: ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/login'),
               style: ElevatedButton.styleFrom(
@@ -155,7 +155,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
+                  color: AppColors.textColor,
                 ), // Use primaryColor
               ),
               const SizedBox(height: 16),
@@ -163,9 +163,29 @@ class _SignupScreenState extends State<SignupScreen> {
               // Name Field
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Name',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: Colors.black87,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -180,9 +200,29 @@ class _SignupScreenState extends State<SignupScreen> {
               // Username Field (New)
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Username',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: Colors.black87,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -197,9 +237,29 @@ class _SignupScreenState extends State<SignupScreen> {
               // Email Field
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: Colors.black87,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
@@ -222,7 +282,27 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: Colors.black87,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -273,7 +353,27 @@ class _SignupScreenState extends State<SignupScreen> {
                 focusNode: _confirmPasswordFocusNode,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
-                  border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(
+                    color: Colors.black87,
+                  ), // Label color
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.unselectedColor,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword
@@ -317,7 +417,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                             'Sign Up',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: AppColors.textColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                 ),
               ),

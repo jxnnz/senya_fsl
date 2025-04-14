@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: const TextStyle(
-                    color: AppColors.primaryColor,
+                    color: Colors.black87,
                   ), // Label color
                   filled: true,
                   fillColor: Colors.white,
@@ -238,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: const TextStyle(
-                    color: AppColors.primaryColor,
+                    color: Colors.black87,
                   ), // Label color
                   filled: true,
                   fillColor: Colors.white,

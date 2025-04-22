@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:senya_fsl/widgets/flashcard_set_screen.dart'; // ✅ Use your actual flashcard viewer
 import '../../themes/color.dart';
+import '../loading_screen.dart';
 
 class FlashcardSet {
   final String id;
@@ -96,7 +97,18 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                         children:
                             flashcardSets.map((set) {
                               return GestureDetector(
-                                onTap: () {
+                                onTap: () async {
+                                  // Show the loading screen first
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) =>
+                                              const LoadingScreen(), // the screen we built earlier
+                                    ),
+                                  );
+
+                                  // Then navigate to the flashcard set screen
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

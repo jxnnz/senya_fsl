@@ -5,6 +5,8 @@ import 'package:senya_fsl/widgets/game_mode_level.dart';
 import 'screens/admin/admin_main.dart';
 import 'screens/dashboard/flashcard_screen.dart';
 import 'screens/dashboard/home_screen.dart';
+import 'screens/forgotpassword_screen.dart';
+import 'screens/loading_screen.dart';
 import 'screens/logo_screen.dart';
 import 'screens/dashboard/practice_screen.dart';
 import 'screens/dashboard/profile_screen.dart';
@@ -42,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/admin': (context) => AdminMainScreen(),
         '/home': (context) => const HomeScreen(),
         '/lesson': (context) => const LessonModuleScreen(lessonId: 1),
@@ -51,8 +54,7 @@ class MyApp extends StatelessWidget {
         '/practice': (context) => const PracticeScreen(),
         '/gamemode': (context) => const GameModeScreen(),
         '/profile': (context) => const ProfileScreen(),
-        //'/loading': (context) => const LoadingScreen(),
-        // Route for loading
+        '/loading': (context) => const LoadingScreen(),
       }, // Set the LogoScreen as the starting screen
     );
   }

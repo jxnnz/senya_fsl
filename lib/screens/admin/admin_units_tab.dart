@@ -12,9 +12,11 @@ class _AdminUnitsTabState extends State<AdminUnitsTab> {
   final List<String> units = [];
 
   void _addUnit() {
-    if (_unitController.text.isEmpty) return;
+    final text = _unitController.text.trim();
+    if (text.isEmpty) return;
+
     setState(() {
-      units.add(_unitController.text);
+      units.add(text);
       _unitController.clear();
     });
   }
@@ -28,38 +30,75 @@ class _AdminUnitsTabState extends State<AdminUnitsTab> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'Add New Unit',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+
+          // Input field
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _unitController,
+                  decoration: const InputDecoration(
+                    labelText: 'Unit Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                onPressed: _addUnit,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 18,
+                  ),
+                ),
+                child: const Text('Add'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          const Divider(),
+
+          const Text(
+            'Units List',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _unitController,
-            decoration: const InputDecoration(labelText: 'Unit Name'),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(onPressed: _addUnit, child: const Text('Add Unit')),
-          const Divider(height: 32),
-          const Text(
-            'Units List',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
+
+          // List of units
           ...units.asMap().entries.map((entry) {
             final index = entry.key;
             final unit = entry.value;
-            return ListTile(
-              title: Text(unit),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () => _deleteUnit(index),
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                title: Text(unit),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _deleteUnit(index),
+                ),
               ),
             );
           }),
+
+          if (units.isEmpty)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text(
+                'No units added yet.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
         ],
       ),
     );

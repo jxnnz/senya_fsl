@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../themes/color.dart';
 
 import 'admin_units_tab.dart';
 import 'admin_lessons_tab.dart';
@@ -11,97 +12,135 @@ class AdminMainScreen extends StatefulWidget {
   State<AdminMainScreen> createState() => _AdminMainScreenState();
 }
 
-class _AdminMainScreenState extends State<AdminMainScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _AdminMainScreenState extends State<AdminMainScreen> {
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
+  final List<Widget> _screens = const [
+    AdminUnitsTab(),
+    AdminLessonsTab(),
+    AdminSignsTab(),
+  ];
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  final List<String> _titles = ['Units', 'Lessons', 'Words & Videos'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
+          // Collapsed Sidebar
           Container(
-            width: 240,
-            color: Colors.blueGrey.shade50,
+            width: 85,
+            color: AppColors.primaryColor,
             child: Column(
               children: [
-                Container(
-                  height: 64,
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const Text(
-                    'Admin',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.view_module),
-                  title: const Text('Units'),
-                  selected: _tabController.index == 0,
-                  onTap: () => _tabController.index = 0,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.school),
-                  title: const Text('Lessons'),
-                  selected: _tabController.index == 1,
-                  onTap: () => _tabController.index = 1,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.video_library),
-                  title: const Text('Words & Videos'),
-                  selected: _tabController.index == 2,
-                  onTap: () => _tabController.index = 2,
-                ),
+                const SizedBox(height: 20),
+                Center(child: Image.asset('assets/images/LOGO.png', width: 50)),
+                const SizedBox(height: 20),
+                _buildSidebarItem(0, Icons.view_module, 'Units'),
+                _buildSidebarItem(1, Icons.school, 'Lessons'),
+                _buildSidebarItem(2, Icons.video_library, 'Signs'),
                 const Spacer(),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text('Logout'),
+                GestureDetector(
                   onTap: () {
-                    // Add logout logic
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                TabBar(
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Units'),
-                    Tab(text: 'Lessons'),
-                    Tab(text: 'Words & Videos'),
-                  ],
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: const [
-                      AdminUnitsTab(),
-                      AdminLessonsTab(),
-                      AdminSignsTab(),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.logout,
+                          color: AppColors.selectedColor,
+                          size: 30,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Logout",
+                        style: TextStyle(
+                          color: AppColors.selectedColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+
+          // Content Area
+          Expanded(
+            child: Column(
+              children: [
+                AppBar(
+                  automaticallyImplyLeading: false,
+                  title: Text(_titles[_selectedIndex]),
+                  elevation: 1,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                ),
+                Expanded(child: _screens[_selectedIndex]),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarItem(int index, IconData icon, String label) {
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        decoration:
+            isSelected
+                ? BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                )
+                : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color:
+                  isSelected
+                      ? AppColors.selectedColor
+                      : AppColors.unselectedColor,
+              size: 30,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color:
+                    isSelected
+                        ? AppColors.selectedColor
+                        : AppColors.unselectedColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
